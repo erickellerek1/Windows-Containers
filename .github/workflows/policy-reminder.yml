@@ -7,17 +7,18 @@ on:
 jobs:
   policy-reminder:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
     - name: Remind New Issues of Support Policy
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const issueComment = context.issue({
-            body: `Thank you for creating an issue. Please note that GitHub is not an official 
-              channel for Microsoft support requests. To create an official support request, 
-              please open a ticket 
-              [here](https://learn.microsoft.com/en-us/services-hub/unified/support/open-support-requests).
-              Microsoft and the GitHub community strive to provide a best effort in answering
-              questions and supporting Issues on GitHub.`
-          });
-          github.issues.createComment(issueComment);
+      run: gh issue comment "$NUMBER" --body "$BODY"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+        NUMBER: ${{ github.event.issue.number }}
+        BODY: >
+          Thank your for creating an Issue. Please note that GitHub is not an official
+          channel for Microsoft support requests. To create an official support request,
+          please open a ticket [here](https://learn.microsoft.com/en-us/services-hub/unified/support/open-support-requests).
+          Microsoft and the GitHub Community strive to provide a best effort in answering
+          questions and supporting Issues on GitHub.
